@@ -1,0 +1,56 @@
+----SELECT_ATTRIBUTES----
+4
+cust
+1_avg_quant
+2_avg_quant
+3_avg_quant
+----GROUPING_VARIABLES----
+3
+----GROUPING_ATTRIBUTE----
+1
+cust
+----AGGREGATE_FUNCTIONS----
+3
+1_avg_quant
+2_avg_quant
+3_avg_quant
+----SUCH THAT_PREDICATES----
+3
+((1.cust=cust)&(1.state='NY'))
+((2.cust=cust)&(2.state='CT'))
+((3.cust=cust)&(3.state='NJ'))
+----HAVING_CLAUSE----
+1
+((1_avg_quant>2_avg_quant)&(1_avg_quant>3_avg_quant))
+----WHERE_CLAUSE----
+1
+(year=1997)
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select *
+    from sales
+	where year=1997 and state='NY'
+	),
+y as
+    (select *
+    from sales
+	where year=1997 and state='CT'
+	),
+z as
+    (select *
+    from sales
+	where year=1997 and state='NJ'
+	),
+zero as
+    (select *
+    from sales
+	 where year=1997
+	)
+select zero.cust, avg(x.quant) as NY, avg(y.quant) as CT, avg(z.quant) as NJ
+from zero, x, y, z
+where zero.cust = x.cust and zero.cust=y.cust and zero.cust = z.cust
+group by zero.cust, x.cust, y.cust, z.cust
+having avg(x.quant)>avg(y.quant) and avg(x.quant)>avg(z.quant);

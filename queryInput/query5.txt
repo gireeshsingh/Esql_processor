@@ -1,0 +1,77 @@
+----SELECT_ATTRIBUTES----
+3
+prod
+month
+3_count_all
+----GROUPING_VARIABLES----
+3
+----GROUPING_ATTRIBUTE----
+2
+prod
+month
+----AGGREGATE_FUNCTIONS----
+3
+1_avg_quant
+2_avg_quant
+3_count_all
+----SUCH THAT_PREDICATES----
+3
+((1.prod=prod)and(1.month=(month-1)))
+((2.prod=prod)and(2.month=(month+1)))
+((((3.prod=prod)and(3.month=month))and(3.quant>1_avg_quant))and(3.quant<2_avg_quant))
+----HAVING_CLAUSE----
+0
+----WHERE_CLAUSE----
+1
+(year=1997)
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select prod, month, avg(quant) as xquant
+    from sales
+	 where year=1997
+	 group by prod, month
+	),
+y as
+    (select prod, month, avg(quant) as yquant
+    from sales
+	 where year=1997
+	 group by prod, month
+	),
+z as
+    (select prod, month, quant
+    from sales
+	 where year=1997
+	),
+zero as
+    (select prod, month
+    from sales
+	 where year=1997
+	)
+select zero.prod, zero.month, count(z.*)
+from zero, x, y, z
+where x.prod = zero.prod and y.prod = zero.prod and z.prod=zero.prod
+	and x.month = zero.month-1 and y.month = zero.month +1 and z.month = zero.month
+	and z.quant>x.xquant and z.quant<y.yquant
+group by zero.prod, zero.month
+-------------------------
+WITH t1 as
+    (select prod, month, avg(quant) as xquant
+    from sales
+	 where year=1997
+	 group by prod, month
+	),
+t2 as
+    (select prod, month, quant
+    from sales
+	 where year=1997
+	)
+select z.prod, z.month, count(z.*)
+from t1 x,t1 y, t2 z
+where x.prod = z.prod and y.prod = z.prod
+	and x.month = z.month-1 and y.month = z.month +1 
+	and z.quant>x.xquant and z.quant<y.xquant
+group by z.prod, z.month
+

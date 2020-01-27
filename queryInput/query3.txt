@@ -1,0 +1,46 @@
+----SELECT_ATTRIBUTES----
+3
+prod
+month
+(1_sum_quant/2_sum_quant)
+----GROUPING_VARIABLES----
+2
+----GROUPING_ATTRIBUTE----
+2
+prod
+month
+----AGGREGATE_FUNCTIONS----
+2
+1_sum_quant
+2_sum_quant
+----SUCH THAT_PREDICATES----
+2
+((1.prod=prod)and(1.month=month))
+(2.prod=prod)
+----HAVING_CLAUSE----
+0
+----WHERE_CLAUSE----
+1
+(year=1997)
+
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select *
+    from sales
+	),
+y as
+    (select *
+    from sales
+	),
+zero as
+    (select *
+    from sales
+	)
+select zero.prod, zero.month, sum(x.quant)/sum(y.quant)
+from zero, x, y
+where zero.month = x.month and zero.prod=x.prod
+		and zero.prod=y.prod and zero.year=1997
+group by zero.month, zero.prod, x.prod, x.month, y.prod;

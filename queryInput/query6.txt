@@ -1,0 +1,47 @@
+----SELECT_ATTRIBUTES----
+4
+cust
+prod
+1_avg_quant
+2_avg_quant
+----GROUPING_VARIABLES----
+2
+----GROUPING_ATTRIBUTE----
+2
+cust
+prod
+----AGGREGATE_FUNCTIONS----
+2
+1_avg_quant
+2_avg_quant
+----SUCH THAT_PREDICATES----
+2
+((1.cust=cust)and(1.prod=prod))
+((2.cust<>cust)and(2.prod=prod))
+----HAVING_CLAUSE----
+0
+----WHERE_CLAUSE----
+0
+
+
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select *
+    from sales
+	),
+y as
+    (select *
+    from sales
+	),
+zero as
+    (select *
+    from sales
+	)
+select zero.cust, zero.prod, avg(x.quant), avg(y.quant)
+from zero, x, y
+where 	x.cust = zero.cust and x.prod = zero.prod
+		and y.cust != zero.cust and y.prod = zero.prod
+group by zero.cust, zero.prod, x.cust, x.prod, y.prod;

@@ -1,0 +1,65 @@
+----SELECT_ATTRIBUTES----
+7
+cust
+1_sum_quant
+1_avg_quant
+2_sum_quant
+2_avg_quant
+3_sum_quant
+3_avg_quant
+----GROUPING_VARIABLES----
+3
+----GROUPING_ATTRIBUTE----
+1
+cust
+----AGGREGATE_FUNCTIONS----
+6
+1_sum_quant
+1_avg_quant
+2_sum_quant
+2_avg_quant
+3_sum_quant
+3_avg_quant
+----SUCH THAT_PREDICATES----
+3
+((1.cust=cust)and(1.state='NY'))
+((2.cust=cust)and(2.state='NJ'))
+((3.cust=cust)and(3.state='CT'))
+----HAVING_CLAUSE----
+1
+((1_sum_quant>(2*2_sum_quant))or(1_avg_quant>3_avg_quant))
+----WHERE_CLAUSE----
+0
+
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+/*
+WITH x as
+    (select *
+    from sales
+	where state='NY'
+	),
+y as
+    (select *
+    from sales
+	where state='NJ'
+	),
+z as
+    (select *
+    from sales
+	where state='CT'
+	),
+zero as
+    (select *
+    from sales
+	)
+select zero.cust, sum(x.quant) as NY_sum, avg(x.quant) as NY_avg,
+	sum(y.quant) as NJ_sum, avg(y.quant) as NJ_avg,
+	sum(z.quant) as CT_sum, avg(z.quant) as CT_avg
+from zero, x, y, z
+where zero.cust = x.cust and zero.cust=y.cust and zero.cust = z.cust
+group by zero.cust, x.cust, y.cust, z.cust
+having avg(x.quant)>2*avg(y.quant) or avg(x.quant)>avg(z.quant);
+*/

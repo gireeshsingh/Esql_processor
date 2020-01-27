@@ -1,0 +1,52 @@
+----SELECT_ATTRIBUTES----
+5
+cust
+month
+1_avg_quant
+avg_quant
+2_avg_quant
+----GROUPING_VARIABLES----
+2
+----GROUPING_ATTRIBUTE----
+2
+cust
+month
+----AGGREGATE_FUNCTIONS----
+3
+1_avg_quant
+2_avg_quant
+avg_quant
+----SUCH THAT_PREDICATES----
+2
+((1.cust=cust)and(1.month<month))
+((2.cust=cust)and(2.month>month))
+----HAVING_CLAUSE----
+0
+----WHERE_CLAUSE----
+1
+(year=1997)
+
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select *
+    from sales
+	 where year=1997
+	),
+y as
+    (select *
+    from sales
+	  where year=1997
+	),
+zero as
+    (select *
+    from sales
+	 where year=1997
+	)
+select zero.cust, zero.month, avg(x.quant), avg(zero.quant), avg(y.quant)
+from zero, x, y
+where x.cust = zero.cust and x.month < zero.month
+		and y.cust = zero.cust and y.month > zero.month
+group by zero.cust, zero.month, x.cust, y.cust;

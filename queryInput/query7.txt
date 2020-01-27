@@ -1,0 +1,46 @@
+----SELECT_ATTRIBUTES----
+2
+prod
+quant
+----GROUPING_VARIABLES----
+2
+----GROUPING_ATTRIBUTE----
+2
+prod
+quant
+----AGGREGATE_FUNCTIONS----
+2
+1_count_prod
+2_count_prod
+----SUCH THAT_PREDICATES----
+2
+(1.prod=prod)
+((2.prod=prod)and(2.quant<quant))
+----HAVING_CLAUSE----
+1
+(2_count_prod=(1_count_prod/2))
+----WHERE_CLAUSE----
+0
+
+
+--------------------------
+EQUIVALENT SQL
+--------------------------
+WITH x as
+    (select *
+    from sales
+	),
+y as
+    (select *
+    from sales
+	),
+zero as
+    (select *
+    from sales
+	)
+select zero.prod, zero.quant
+from zero, x, y
+where 	x.prod = zero.prod
+		and y.prod = zero.prod and y.quant < zero.quant
+group by zero.prod, zero.quant, x.prod, y.prod
+having count(y.prod)=count(x.prod)/2;
