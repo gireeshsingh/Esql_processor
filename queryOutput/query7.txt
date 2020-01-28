@@ -1,0 +1,14 @@
+TIME (MM/dd/yyyy HH:mm:ss)::::12/07/2019 06:50:56
+ --------------  -------------- 
+  prod            quant         
+ --------------  -------------- 
+ Pepsi                 2768    
+ Butter                1786    
+ Fruits                2525    
+ Milk                  2004    
+ Cookies               2500    
+ Eggs                  2151    
+ Yogurt                2497    
+ Coke                  2681    
+ Bread                 1932    
+ Soap                  2231    
